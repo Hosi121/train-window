@@ -18,7 +18,8 @@
 - [東急電鉄・公式路線図](https://www.tokyu.co.jp/railway/map/)：多摩川 TY09、新丸子 TY10、武蔵小杉 TY11、元住吉 TY12、日吉 TY13、綱島 TY14、大倉山 TY15、菊名 TY16。
 - 駅の座標は英語版Wikipedia各駅ページの公開座標を参照。各URLと値は `src/data/stations.js` に記録。原典ページはアプリの出典画面からも開けます。
 - 路線の駅順から独自のSVG路線図を作成。地理表示は駅間を直線で結んだ概略図です。
-- 実際の周辺地図：[OpenStreetMap](https://www.openstreetmap.org/copyright)。利用者が地図を開いた場合にのみ公式埋め込みを読み込みます。
+- 背景地図：[OpenFreeMap](https://openfreemap.org/quick_start/) / © [OpenMapTiles](https://www.openmaptiles.org/) / [OpenStreetMap](https://www.openstreetmap.org/copyright)。地図画面を開くと読み込みます。Positronの既存レイヤーの色を変更し、日本語の地名を優先しています。帰属表示は元のタイルデータから取得し、地図内に常時表示します。
+- 表示エンジン：[MapLibre GL JS](https://maplibre.org/maplibre-gl-js/docs/)。背景地図が使えない場合も、駅座標から作成した簡略図で駅を選べます。
 
 ## 地名の由来と周辺スポット
 

@@ -95,23 +95,6 @@
   .footer-actions > button:first-child { font-size: 10px; color: #c3d2c6; }
   .sound-error { @apply text-xs pb-4 text-center; }
   .skip-link { @apply fixed -translate-y-32 top-3 left-3 z-50 bg-white text-ink p-4 rounded focus:translate-y-0; }
-  .route-view { background: #94c3d0; color: #263b3e; }
-  .route-view.theme-night { background: #326780; color: #f1f4e9; }
-  .route-view.theme-dawn { background: #b399a8; color: #332d32; }
-  .route-view .icon-button, .route-view .route-label, .route-view .route-label > span, .route-view .mode-group button, .route-view .transport-controls select, .route-view .footer-actions > button:first-child { color: inherit; }
-  .route-view .mode-group button[aria-pressed="true"] { color: inherit; }
-  .route-overview { position: relative; flex: 1; padding: 90px 8vw 240px; display: flex; align-items: flex-start; }
-  .overview-route { display: flex; width: 100%; align-items: flex-start; position: relative; }
-  .overview-route::before { content: ""; position: absolute; left: -10vw; right: -10vw; top: 8px; height: 3px; background: #dc5558; }
-  .route-line-badge { display: grid; place-items: center; width: 23px; height: 21px; margin-top: -2px; background: #d62c3e; color: white; font: 700 9px sans-serif; z-index: 10; }
-  .overview-stations { display: grid; grid-template-columns: repeat(8,1fr); width: 100%; }
-  .overview-station { display: flex; flex-direction: column; align-items: center; gap: 16px; position: relative; font-size: 13px; }
-  .overview-dot { width: 14px; height: 14px; background: #eeeee4; border: 1px solid #435955; border-radius: 50%; margin-top: 3px; }
-  .overview-station.is-current .overview-dot { background: #df8741; }
-  .overview-name { writing-mode: vertical-rl; line-height: 1.5; }
-  .railway-landscape { position: absolute; left: 0; right: 0; bottom: 18%; height: 170px; overflow: hidden; }
-  .railway-landscape svg { width: 100%; height: 100%; }
-
   .dialog-overlay { @apply fixed inset-0 z-40; background: #06110dec; }
   .dialog-content { @apply fixed z-50 overflow-auto text-white; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(1050px, calc(100% - 72px)); max-height: calc(100dvh - 64px); overscroll-behavior: contain; background: #10271f; }
   .dialog-narrow { max-width: 780px; }
@@ -153,27 +136,8 @@
   .save-detail { @apply mt-7 w-full; }
   .save-detail.is-saved { background: #ffffff0a; }
   .map-detail { @apply grid grid-cols-2 gap-8; }
-  .geographic-map { @apply relative p-4; background: #e7ebe4; color: #203d31; }
-  .geographic-map > svg { @apply w-full; }
-  .map-river { fill: none; stroke: #b5d2d3; stroke-width: 12; stroke-linecap: round; }
-  .map-river-small { stroke-width: 7; }
-  .map-river-label { fill: #426c72; font-size: 10px; }
-  .map-area-label { fill: #606c5d; font-size: 9px; }
-  .map-route { fill: none; stroke: #1c5344; stroke-width: 3; stroke-linejoin: round; }
-  .map-station-label { font-size: 11px; fill: #455044; }
-  .map-station-label.selected { fill: #1c5344; font-weight: 700; }
-  .map-north { fill: currentColor; font-size: 8px; }
-  .map-disclaimer { @apply block text-center mt-3; font-size: 9px; color: #52624f; }
-  .map-station-links { @apply flex flex-wrap gap-2 mt-2; }
-  .map-station-choice { @apply px-2 py-1.5 text-xs border; background: #f1f4ef; border-color: #a9b5a6; }
-  .map-station-choice.is-selected { @apply bg-forest text-white border-forest; }
   .map-detail-right h3 { @apply text-2xl font-normal mt-3 mb-2; }
   .map-detail-right h3 small { @apply block font-sans text-xs mt-2; color: #b1c3b6; }
-  .real-map { @apply my-6 h-72 overflow-hidden; background: #ffffff08; }
-  .real-map iframe { @apply size-full border-0; }
-  .load-map { @apply flex size-full flex-col justify-center items-center gap-5; }
-  .load-map p { @apply text-sm; }
-  .load-map small { @apply text-xs; color: #b1c3b6; }
   .about-content > h3 { @apply font-serif font-normal text-2xl leading-relaxed my-5; }
   .about-content > p { @apply text-sm leading-8; color: #c4d1c5; }
   .about-steps { @apply grid grid-cols-3 gap-6 my-8 py-7 border-y; border-color: #ffffff1c; }
@@ -250,11 +214,6 @@
   .footer-actions { gap: 2px; }
   .footer-actions > button:first-child { display: none; }
   .footer-actions .icon-button { @apply size-7; }
-  .route-overview { padding: 80px 5vw 160px; }
-  .overview-station { gap: 14px; font-size: 12px; }
-  .overview-dot { width: 10px; height: 10px; margin-top: 5px; }
-  .route-line-badge { width: 19px; height: 18px; margin-top: 0; font-size: 8px; }
-  .railway-landscape { bottom: 12%; }
   .dialog-content { width: calc(100% - 24px); max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
   .dialog-header { @apply px-5 py-4; }
   .dialog-header h2 { @apply text-base; }
