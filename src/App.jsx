@@ -1,13 +1,14 @@
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useCallback, useRef, useState, useSyncExternalStore } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { motion, useAnimationFrame, useInView, useMotionValue, useReducedMotion } from 'motion/react';
-import { ArrowRight, ArrowUpRight, Bookmark, Check, ChevronLeft, ChevronRight, Eye, Footprints, Info, Map, MapPin, Moon, Pause, Play, RotateCcw, Sun, Sunrise, TrainFront, Volume2, VolumeX, X } from 'lucide-react';
-import { Barcode, STRIP_WIDTH } from './Barcode.jsx';
+import { useReducedMotion } from 'motion/react';
+import { ArrowRight, ArrowUpRight, Bookmark, Check, ChevronLeft, ChevronRight, Eye, Footprints, Info, Map, MapPin, Moon, Pause, Play, RotateCcw, Sun, Sunrise, Volume2, VolumeX, X } from 'lucide-react';
+import { Barcode } from './Barcode.jsx';
 import { stations, routeSource } from './data/stations.js';
 import { cn, mapUrl, readSaved } from './lib.js';
 import { useTrainSound } from './useTrainSound.js';
 import { Explore } from './Explore.jsx';
 import { StationMap } from './StationMap.jsx';
+import { PhotographicJourney } from './PhotographicJourney.jsx';
 
 const modes = [{ id: 'day', label: '朝', Icon: Sun }, { id: 'night', label: '夜', Icon: Moon }, { id: 'dawn', label: '夜明け', Icon: Sunrise }];
 const carriageColors = ['#20563f', '#24534c', '#344948', '#583c32', '#414c33', '#254c39', '#573d42', '#4a4037'];
@@ -22,43 +23,6 @@ function External({ href, children, className }) {
 }
 function Credit({ station }) {
   return <p className="photo-credit"><External href={station.photo.source}>{station.photo.author}</External><span> / </span><External href={station.photo.licenseUrl}>{station.photo.license}</External></p>;
-}
-
-function Journey({ station, previousStation, nextStation, active, speed, mode, onNext, onExplore, onVisible, resetKey, peek, onPeek, onPrevious, onForward }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { amount: 0.15 });
-  const x = useMotionValue(0);
-  const nearX = useMotionValue(0);
-  const progress = useMotionValue(0);
-  const elapsed = useRef(0);
-  const changed = useRef(false);
-  useEffect(() => { elapsed.current = 0; changed.current = false; progress.set(0); }, [station.id, resetKey, progress]);
-  useEffect(() => onVisible(inView), [inView, onVisible]);
-  useAnimationFrame((_, delta) => {
-    if (!active || !inView) return;
-    const dt = Math.min(delta, 64) * speed;
-    x.set((x.get() - dt * 0.12) % STRIP_WIDTH);
-    nearX.set((nearX.get() - dt * 0.38) % STRIP_WIDTH);
-    elapsed.current += dt;
-    progress.set(Math.min(elapsed.current / 24000, 1));
-    if (elapsed.current >= 24000 && !changed.current) { changed.current = true; onNext(); }
-  });
-  return <section ref={ref} className="carriage" aria-label="流れる車窓">
-    <div className="window-scene"><div className="window-row">
-      {[0, 1, 2].map((i) => <div className={cn('window-unit', i === 1 && 'window-unit-center')} key={i}>
-        <button className="train-window" onClick={onPeek} aria-pressed={peek} aria-label={`${station.name}の車窓${i === 1 ? '' : i === 0 ? '（左）' : '（右）'}：${peek ? '色に戻す' : '写真を見る'}`}>
-          <Barcode photo={station.photo} x={x} nearX={nearX} mode={mode} offset={i * 440} />
-          {i === 1 && <motion.img className="window-original" src={station.photo.src} alt={peek ? station.photoCaption : ''} aria-hidden={!peek} initial={false} animate={{ opacity: peek ? 1 : 0 }} transition={{ duration: .18 }} width={station.photo.width} height={station.photo.height} />}
-        </button>
-      </div>)}
-    </div></div>
-    <div className="station-captions">
-      <div>{previousStation && <button className="neighbor-station" onClick={onPrevious} aria-label={`前の駅、${previousStation.name}へ`}><StationCode station={previousStation} /><span>{previousStation.name}</span></button>}</div>
-      <div><button className="current-station" onClick={onExplore} aria-label={`${station.name}の駅と街について`}><StationCode station={station} /><span>{station.name}</span></button>{peek && <button className="peek-info" onClick={onExplore} aria-label={`${station.name}の写真と駅の情報を見る`}><Info className="size-4" /></button>}</div>
-      <div>{nextStation && <button className="neighbor-station" onClick={onForward} aria-label={`次の駅、${nextStation.name}へ`}><StationCode station={nextStation} /><span>{nextStation.name}</span></button>}</div>
-    </div>
-    <div className="journey-progress" aria-hidden="true"><motion.div style={{ scaleX: progress }} /></div>
-  </section>;
 }
 
 function StationDetail({ station, saved, onSave, onMap }) {
@@ -93,7 +57,7 @@ function About() {
 }
 
 function Sources() {
-  return <div className="sources-content"><p>実際の場所の写真から色を抽出しています。写真は縮小・WebP変換し、横方向に伸ばしたカラーバーコードとしても利用しています。各写真とその派生物には、下記の元のライセンスが適用されます。</p><p className="text-xs text-stone-600">データ収集日：2026年9月5日 · 朝・夜・夜明けは色調の演出です。</p><External href={routeSource}>駅順・駅番号：東急電鉄 公式路線図</External><div className="source-list">{stations.map((s) => <article key={s.id}><img src={s.photo.src} alt={s.photoCaption} loading="lazy" width="112" height="80" /><div><h3>{s.name} <span>{s.code}</span></h3><p>{s.photo.title}</p><Credit station={s} /><div className="flex flex-wrap gap-x-4 gap-y-1"><External href={s.originSource}>地名・駅名の資料</External><External href={s.spotSource}>よりみち先の資料</External><External href={`https://en.wikipedia.org/wiki/${s.wiki}`}>駅の座標</External></div></div></article>)}</div></div>;
+  return <div className="sources-content"><p>実際の場所の写真に横方向のにじみを加えて、車窓として再生しています。写真は縮小・WebP変換し、切り抜き表示や色の抽出にも利用しています。各写真とその派生物には、下記の元のライセンスが適用されます。</p><p className="text-xs text-stone-600">データ収集日：2026年9月5日 · 朝・夜・夜明けは色調の演出です。窓枠は提供された参考写真の内側をマスクして使用しています。</p><External href={routeSource}>駅順・駅番号：東急電鉄 公式路線図</External><div className="source-list">{stations.map((s) => <article key={s.id}><img src={s.photo.src} alt={s.photoCaption} loading="lazy" width="112" height="80" /><div><h3>{s.name} <span>{s.code}</span></h3><p>{s.photo.title}</p><Credit station={s} /><div className="flex flex-wrap gap-x-4 gap-y-1"><External href={s.originSource}>地名・駅名の資料</External><External href={s.spotSource}>よりみち先の資料</External><External href={`https://en.wikipedia.org/wiki/${s.wiki}`}>駅の座標</External></div></div></article>)}</div></div>;
 }
 export default function App() {
   const reduced = useReducedMotion();
@@ -130,14 +94,14 @@ export default function App() {
   };
   const togglePlayback = () => { if (view === 'route') { setView('window'); setPlaying(true); setPeek(false); if (finished) selectStation(0); return; } if (peek) { setPeek(false); setPlaying(true); return; } if (finished) { selectStation(0); setPlaying(true); } else setPlaying((p) => !p); };
   const dialogTitle = modal === 'station' ? detailStation.name : modal === 'map' ? '路線図' : modal === 'saved' ? '次に降りたい駅' : modal === 'sources' ? '出典' : 'この車窓について';
-  return <div className={cn('journey-app', `theme-${mode}`, view === 'route' && 'route-view')} style={{'--carriage-color':carriageColors[current]}}>
+  return <div className={cn('journey-app', `theme-${mode}`, view === 'route' ? 'route-view' : 'photo-view')} style={{'--carriage-color':carriageColors[current]}}>
     <a className="skip-link" href="#journey">車窓へスキップ</a>
     <header className="app-header"><h1>よりみちの車窓</h1><div className="header-actions"><div className="mode-group" aria-label="光の演出">{modes.map(({id,label})=><button key={id} onClick={()=>setMode(id)} aria-pressed={mode===id}>{label}</button>)}</div><span className="header-divider"/><button className="icon-button view-toggle" onClick={()=>{setPeek(false);setView(view==='window'?'route':'window');}} aria-label={view==='window'?'路線図を見る':'車窓に戻る'} title={view==='window'?'路線図':'車窓'}>{view==='window'?<Map className="size-4"/>:<Eye className="size-4"/>}<span>{view==='window'?'地図':'車窓'}</span></button><button className="icon-button saved-link" onClick={()=>openModal('saved')} aria-label={`次に降りたい駅 ${saved.length}件`} title="次に降りたい駅"><Bookmark className="size-4"/>{saved.length>0&&<span>{saved.length}</span>}</button></div></header>
     <main id="journey" className="immersive-main">
-      {view === 'window' ? <Journey station={station} previousStation={stations[current-1]} nextStation={stations[current+1]} active={running} speed={speed} mode={mode} onNext={next} onExplore={()=>openModal('station')} onVisible={setJourneyVisible} resetKey={resetKey} peek={peek} onPeek={()=>setPeek(p=>!p)} onPrevious={()=>selectStation(current-1)} onForward={()=>selectStation(current+1)}/> : <Explore current={current} saved={saved} onSave={toggleSave} onPlay={(i)=>{selectStation(i);setPlaying(true);setView('window');}} onDetail={(i)=>openModal('station',i)} storageError={storageError}/>}
+      {view === 'window' ? <PhotographicJourney suspended={!isVisible || !!modal} station={station} previousStation={stations[current-1]} nextStation={stations[current+1]} active={running} speed={speed} mode={mode} onNext={next} onExplore={()=>openModal('station')} onVisible={setJourneyVisible} resetKey={resetKey} peek={peek} onPeek={()=>setPeek(p=>!p)} onPrevious={()=>selectStation(current-1)} onForward={()=>selectStation(current+1)}/> : <Explore current={current} saved={saved} onSave={toggleSave} onPlay={(i)=>{selectStation(i);setPlaying(true);setView('window');}} onDetail={(i)=>openModal('station',i)} storageError={storageError}/>}
       <p className="sr-only" aria-live="polite">{station.name}、{station.code}{finished?'、終点です。':''}</p>
     </main>
-    <footer className="app-footer">{view==='route'?<button className="footer-now-playing" onClick={()=>setView('window')} aria-label={`${station.name}の車窓に戻る`}><img src={station.photo.src} alt=""/><span>{station.name}<small>{station.code} · 東急東横線</small></span></button>:<button className="route-label" onClick={()=>openModal('map')}>東急東横線<span>多摩川 — 菊名</span></button>}<div className="transport-controls"><button className="icon-button" onClick={()=>selectStation(current-1)} disabled={current===0} aria-label="前の駅へ"><ChevronLeft className="size-4"/></button><button className="icon-button play-button" onClick={togglePlayback} aria-label={finished?'もう一度旅をする':playing&&!peek&&view==='window'?'旅を一時停止':'旅を再生'}>{finished?<RotateCcw className="size-4"/>:playing&&!peek&&view==='window'?<Pause className="size-4"/>:<Play className="size-4"/>}</button><button className="icon-button" onClick={()=>selectStation(current+1)} disabled={current===stations.length-1} aria-label="次の駅へ"><ChevronRight className="size-4"/></button><select value={speed} onChange={(e)=>setSpeed(Number(e.target.value))} aria-label="走行速度"><option value="0.5">0.5×</option><option value="1">1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select><button className="icon-button" onClick={sound.toggle} aria-pressed={sound.enabled} aria-label={sound.enabled?'車内音を消す':'車内音を聴く'}>{sound.enabled?<Volume2 className="size-4"/>:<VolumeX className="size-4"/>}</button></div><div className="footer-actions"><button onClick={()=>openModal('sources')}>出典</button><button className="icon-button" onClick={()=>openModal('about')} aria-label="この車窓について"><Info className="size-4"/></button></div></footer>
+    <footer className="app-footer">{view==='route'?<button className="footer-now-playing" onClick={()=>setView('window')} aria-label={`${station.name}の車窓に戻る`}><img src={station.photo.src} alt=""/><span>{station.name}<small>{station.code} · 東急東横線</small></span></button>:<button className="route-label" onClick={()=>openModal('map')}>東急東横線<span>多摩川 — 菊名</span></button>}<div className="transport-controls"><button className="icon-button" onClick={()=>selectStation(current-1)} disabled={current===0} aria-label="前の駅へ"><ChevronLeft className="size-4"/></button><button className="icon-button play-button" onClick={togglePlayback} aria-label={finished?'もう一度旅をする':playing&&!peek&&view==='window'?'旅を一時停止':'旅を再生'}>{finished?<RotateCcw className="size-4"/>:playing&&!peek&&view==='window'?<Pause className="size-4"/>:<Play className="size-4"/>}</button><button className="icon-button" onClick={()=>selectStation(current+1)} disabled={current===stations.length-1} aria-label="次の駅へ"><ChevronRight className="size-4"/></button><select value={speed} onChange={(e)=>setSpeed(Number(e.target.value))} aria-label="走行速度"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1">1×</option><option value="1.5">1.5×</option><option value="2">2×</option><option value="4">4×</option></select><button className="icon-button" onClick={sound.toggle} aria-pressed={sound.enabled} aria-label={sound.enabled?'車内音を消す':'車内音を聴く'}>{sound.enabled?<Volume2 className="size-4"/>:<VolumeX className="size-4"/>}</button></div><div className="footer-actions"><button onClick={()=>openModal('sources')}>出典</button><button className="icon-button" onClick={()=>openModal('about')} aria-label="この車窓について"><Info className="size-4"/></button></div></footer>
     {sound.error&&<p className="sound-error" role="status">{sound.error}</p>}
     {reduced&&!playing&&<span className="sr-only">動きを控える設定に合わせて停止しています。再生ボタンで旅をはじめられます。</span>}
     <Dialog.Root open={modal!==null} onOpenChange={(open)=>{if(!open)setModal(null);}}><Dialog.Portal><Dialog.Overlay className="dialog-overlay"/><Dialog.Content className={cn('dialog-content',(modal==='about'||modal==='saved'||modal==='sources')&&'dialog-narrow')} onCloseAutoFocus={(event)=>{event.preventDefault();triggerRef.current?.focus();}}><div className="dialog-header"><div>{modal==='station'&&<StationCode station={detailStation}/>}<div><Dialog.Title>{dialogTitle}</Dialog.Title><Dialog.Description className="sr-only">{modal==='station'?'写真、駅名の由来、周辺の見どころ。':dialogTitle}</Dialog.Description></div></div><Dialog.Close className="close-button" aria-label="閉じて車窓に戻る"><X className="size-5"/></Dialog.Close></div><div className="dialog-body">

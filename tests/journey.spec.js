@@ -25,6 +25,11 @@ test('the photo appears inside the window and play returns to the journey', asyn
   await page.getByRole('button', { name: '多摩川の車窓：写真を見る', exact: true }).click();
   await expect(page.locator('.window-original')).toHaveCSS('opacity', '1');
   const film = page.locator('.color-film').first();
+  await expect.poll(async () => {
+    const before = await film.getAttribute('style');
+    await page.waitForTimeout(120);
+    return await film.getAttribute('style') === before;
+  }).toBe(true);
   const paused = await film.getAttribute('style');
   await page.waitForTimeout(200);
   expect(await film.getAttribute('style')).toBe(paused);
@@ -64,10 +69,11 @@ test('all eight real stations can be selected and their assets load', async ({ p
   expect(errors).toEqual([]);
 });
 
-test('24 seconds advances a station; opening a dialog pauses the journey; the end can restart', async ({ page }) => {
+test('24 seconds advances a station even at 4x; dialogs pause the journey and the end can restart', async ({ page }) => {
   await page.clock.install();
   await page.reload();
   await page.evaluate(() => document.fonts.ready);
+  await page.getByRole('combobox', { name: '走行速度' }).selectOption('4');
   await page.clock.pauseAt(new Date(Date.now() + 1000));
   await page.clock.runFor(25000);
   await expect(page.getByRole('button', { name: '新丸子の駅と街について', exact: true })).toBeVisible();
