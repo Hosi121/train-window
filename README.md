@@ -2,6 +2,8 @@
 
 実写の窓枠の向こうを、写真の形と色が横ににじみながら流れるウェブアプリです。東急東横線の **多摩川〜菊名、8駅** を収録しています。
 
+公開URL：**https://train-window-tau.vercel.app**
+
 ![車窓](docs/window.png)
 
 ![地図と駅のライブラリ](docs/explore.png)
@@ -43,7 +45,9 @@ npm run preview
 
 ## Vercelにデプロイ
 
-Vercelの **Add New → Project → Import Git Repository** から `Hosi121/train-window` を選択してDeployします。
+Vercelの `hosi121s-projects/train-window` に本番公開しています。GitHubの `Hosi121/train-window` と接続済みで、`main` へのpushで自動デプロイされます。
+
+別のアカウントで公開する場合は、Vercelの **Add New → Project → Import Git Repository** からリポジトリを選択してDeployします。
 
 | 設定 | 値 |
 | --- | --- |
@@ -53,7 +57,7 @@ Vercelの **Add New → Project → Import Git Repository** から `Hosi121/trai
 | Install Command | `npm ci` |
 | Environment Variables | 不要 |
 
-`vercel.json` にビルド設定を記載しています。GitHubへの公開とVercelへのデプロイは別の操作です。
+`vercel.json` にビルド設定を記載しています。`.vercelignore` で参考スケッチ・文書・テストなどをCLIでのアップロード対象から除外しています。
 
 ## データと素材
 
